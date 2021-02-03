@@ -1,16 +1,17 @@
 #![feature(destructuring_assignment)]
 
 use rand::prelude::*;
+use std::convert::TryInto;
 
 
 fn distribute_cards() -> (Vec<u32>, Vec<u32>) {
-    // As (15), King (14), Queen (12), Valete (11), 10, 9, 8, 7
+    // Ace (15), King (14), Queen (12), Valete (11), 10, 9, 8, 7
     // Done 4 times: Hearth, Tiles, Clovers, Pikes
     let mut cards: Vec<u32> = Vec::new();
     for _ in 1..5 {
         // cards = (7..16).collect();
         for card in 7..16 {
-            cards.push(card)
+            cards.push(card);
         }
     }
     println!("Cards: {:?}", cards);
@@ -20,6 +21,10 @@ fn distribute_cards() -> (Vec<u32>, Vec<u32>) {
 
     // Split between players
     (cards.split_off(cards.len()/2), cards)
+}
+
+fn count_aces(player: &[u32]) -> u32 {
+    return player.iter().filter(|&card| *card == 15).count().try_into().unwrap()
 }
 
 enum PlayResult {
@@ -89,7 +94,10 @@ fn main() {
     loop {
         // match play_once(&mut player1, &mut player2, &mut stack) {
         match play_once(&mut player1, &mut player2, &mut Vec::new()) {
-            PlayResult::PlayerWonHand(player) => { println!(" Player {} won!", player)}
+            PlayResult::PlayerWonHand(_winner) => {
+                // println!(" Player {} won!", winner)
+                println!("\t{}\u{1F0A1}\t{}\u{1F0D1}", count_aces(&player1), count_aces(&player2))
+            }
             PlayResult::PlayerOutOfCards(player) => {
                 println!(" Player {} ran out of cards!", player);
                 return;
