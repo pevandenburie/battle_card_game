@@ -1,8 +1,6 @@
 #![feature(destructuring_assignment)]
 
 use rand::prelude::*;
-use std::convert::TryInto;
-
 
 fn distribute_cards() -> (Vec<u32>, Vec<u32>) {
     // Ace (15), King (14), Queen (12), Valete (11), 10, 9, 8, 7
@@ -23,8 +21,8 @@ fn distribute_cards() -> (Vec<u32>, Vec<u32>) {
     (cards.split_off(cards.len()/2), cards)
 }
 
-fn count_aces(player: &[u32]) -> u32 {
-    return player.iter().filter(|&card| *card == 15).count().try_into().unwrap()
+fn count_aces(player: &[u32]) -> usize {
+    return player.iter().filter(|&card| *card == 15).count()
 }
 
 enum PlayResult {
@@ -83,7 +81,6 @@ fn play_once (player1: &mut Vec<u32>, player2: &mut Vec<u32>, stack: &mut Vec<u3
 fn main() {
     let mut player1: Vec<u32>;
     let mut player2: Vec<u32>;
-    // let mut stack: Vec<u32> = Vec::new();
     
     println!("Battle Card Game Simulator");
 
@@ -92,11 +89,15 @@ fn main() {
     println!("Player2: {:?}", player2);
 
     loop {
-        // match play_once(&mut player1, &mut player2, &mut stack) {
         match play_once(&mut player1, &mut player2, &mut Vec::new()) {
             PlayResult::PlayerWonHand(_winner) => {
                 // println!(" Player {} won!", winner)
-                println!("\t{}\u{1F0A1}\t{}\u{1F0D1}", count_aces(&player1), count_aces(&player2))
+                let nb_aces1 = count_aces(&player1);
+                let nb_aces2 = count_aces(&player2);
+                print!("\t{:🟥<1$}", "", nb_aces1);
+                print!("{:⬜<1$}", "", player1.len()-nb_aces1);
+                print!(" | {:⬜<1$}", "", player2.len()-nb_aces2);
+                println!("{:🟥<1$}", "", nb_aces2);
             }
             PlayResult::PlayerOutOfCards(player) => {
                 println!(" Player {} ran out of cards!", player);
